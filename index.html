@@ -17,21 +17,24 @@
     </hearer>
     <div class="content">
         <div class="container">
-            <form action="" method="post">
+            <form action="" method="post" name="peopleForm">
+                <p class='content__form-error hidden' id="form-error"></p>
+                <p class='content__form-success hidden' id="form-success"></p>
                 <p class="content__form-group">
-                <label for="name">Имя*</label>
-                <input type="text">
+                    <label for="name">Имя*</label>
+                    <input type="text" name="name" value="" id="name">
                 </p>
                 <p class="content__form-group">
-                <label for="name">Фамилия*</label>
-                <input type="text">
+                    <label for="surname">Фамилия*</label>
+                    <input type="text" name="surname" value="" id="surname">
                 </p>
                 <p class="content__form-group">
-                <label for="name">Возраст, лет*</label>
-                <input type="number" min="1" step="1">
+                    <label for="age">Возраст, лет*</label>
+                    <input type="number" min="1" step="1" name="age" value="" id="age">
                 </p>
+                <p>* Обязательно для заполнения</p>
                 <p class="content__form-group">
-                <button type="submit" class="button">Сохранить</button>
+                    <a href="#" onclick="event.preventDefault(); saveRecord();" class="button" name="add_people">Сохранить</a>
                     <a href="/get_recruits.php" class="button">Выгрузить</a>
                 </p>
             </form>
@@ -43,5 +46,6 @@
         </div>
     </foother>
 </div>
+<script src="js/app.js"></script>
 </body>
 </html>
