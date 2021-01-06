@@ -46,7 +46,6 @@ function saveRecord() {
             return res.json();
         })
         .then(function (data) {
-            console.log(JSON.stringify(data));
             if (data.status === 200) {
                 document.peopleForm.reset();
                 document.getElementById('form-success').classList.remove('hidden');
@@ -62,4 +61,28 @@ function saveRecord() {
                 document.getElementById('form-error').innerHTML = '';
             }, 2000);
         })
+}
+
+async function exportRecords() {
+    await fetch("/google-doc-exporter.php")
+        .then(function (res) {
+            return res.json();
+        })
+        .then(function (data) {
+            if (data.status === 200) {
+                document.peopleForm.reset();
+                document.getElementById('form-success').classList.remove('hidden');
+                document.getElementById('form-success').innerHTML = data.message;
+            } else {
+                document.getElementById('form-error').classList.remove('hidden');
+                document.getElementById('form-error').innerHTML = data.message;
+            }
+            setTimeout(function () {
+                document.getElementById('form-success').classList.add('hidden');
+                document.getElementById('form-success').innerHTML = '';
+                document.getElementById('form-error').classList.add('hidden');
+                document.getElementById('form-error').innerHTML = '';
+            }, 20000);
+        })
+
 }

@@ -43,87 +43,6 @@ class Database
         return false;
     }
 
-    /**
-     *
-     * Вставка в БД множества строк единым запросом
-     *
-     * @param $table
-     * @param array $data
-     * @return bool
-     */
-
-
-    public function multiInsert($table, array $data)
-    {
-        $this->pdo->beginTransaction();
-
-        $fields = implode(", ", array_keys($data[0]));
-        $sql = "INSERT INTO $table ($fields) VALUES ";
-        $insertQuery = array();
-        $insertData = array();
-        foreach ($data as $row) {
-            $insertQuery[] = '(?, ?, ?)';
-            $insertData = array_merge($insertData, array_values($row));
-        }
-        if (!empty($insertQuery)) {
-            $sql .= implode(', ', $insertQuery);
-            $statement = $this->pdo->prepare($sql);
-            $statement->execute($insertData);
-        }
-
-        return $this->pdo->commit();
-    }
-
-    /**
-     * Добавление в БД данных из массива при отсутствии и обновлении при наличии
-     *
-     * @param $table
-     * @param array $data
-     * @param array $updFieds
-     * @return bool
-     */
-    public function insertWithUpd($table, array $data, array $updFieds)
-    {
-        $this->pdo->beginTransaction();
-
-        $fields = implode(", ", array_keys($data[0]));
-        $sql = "INSERT INTO $table ($fields) VALUES ";
-        $insertQuery = array();
-        $insertData = array();
-        //собираем плейсхолдеры
-        $holders = makePlsholders(count($data[0]));
-        // собираем строку для указания какие поля на что обновлять
-        $fieldSrt = makeUpdPlsholders($updFieds);
-
-        foreach ($data as $row) {
-            $insertQuery[] = $holders;
-            $insertData = array_merge($insertData, array_values($row));
-        }
-
-        if (!empty($insertQuery)) {
-            $sql .= implode(', ', $insertQuery)." ON DUPLICATE KEY UPDATE ".$fieldSrt;
-            var_dump($sql);
-            $statement = $this->pdo->prepare($sql);
-            $statement->execute($insertData);
-        }
-
-        return $this->pdo->commit();
-    }
-
-
-
-    /**
-     * Вставка в БД множества строк
-     *
-     * @param $table
-     * @param array $data
-     */
-    public function insertManyRecords($table, array $data)
-    {
-        foreach ($data as $item) {
-            $this->insertSingleRecord($table, $item);
-        }
-    }
 
     /**
      * Получение данных из БД по одному из реквизитов
@@ -144,74 +63,19 @@ class Database
     }
 
     /**
-     * Удаление записи
-     *
+     * Получение данных из таблицы по условию на 1 поле
      * @param $table
      * @param $field
-     * @param $data
-     * @return bool
-     */
-
-    public function delete($table, $field, $data)
-    {
-        $sql = "DELETE FROM $table WHERE $field =  ?";
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($data);
-
-        return true;
-    }
-
-    /**
-     * Получить все поля из БД по нескольким условиям
-     * имена полей - ключи входного массива $data
-     *
-     * @param $table
-     * @param array $data
-     * @param string $operand
+     * @param $value
+     * @param string $condition
      * @return array
      */
-
-
-    public function getByFields($table, array $data, $operand = "AND")
+    public function getByFieldAndCondition($table, $field, $value, $condition = "=")
     {
-        $sql = "SELECT * FROM $table WHERE ";
-
-        // необходимость конструкции AND или OR
-        $num = 1;
-        $append = $operand;
-        foreach ($data as $key => $value) {
-            // подсчитываем четность или не четность
-            if (($num % 2) == 0) $append = '';
-            $sql .= $key." = :".$key." ".$append." ";
-            $num++;
-        }
+        $sql = "SELECT * FROM $table WHERE $field $condition :$field";
         $statement = $this->pdo->prepare($sql);
-        $statement->execute($data);
+        $statement->execute([$field => $value]);
 
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Update 1 поля по ID
-     *
-     * @param $table
-     * @param $updField
-     * @param $data
-     * @param $id
-     * @return bool
-     */
-
-    public function updateOneFieldById($table, $updField, $data, $id)
-    {
-        $field = $updField." = :".$updField;
-        $sql = "UPDATE $table SET $field WHERE ID = :ID";
-        $statement = $this->pdo->prepare($sql);
-        $statement->bindParam(':Value', $Value);
-        $statement->bindParam(':ID', $ID);
-        $Value = $data;
-        $ID = $id;
-        $statement->execute();
-
-        return true;
+        return $statement->fetchAll(PDO::FETCH_NUM);
     }
 }
