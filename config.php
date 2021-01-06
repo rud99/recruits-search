@@ -1,5 +1,6 @@
 <?php
-require 'vendor/autoload.php';
+require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+
 // отключаем предупрежения об ошибках - в библиотеке для google.docs они есть, но на работу не влияют
 error_reporting(0);
 
