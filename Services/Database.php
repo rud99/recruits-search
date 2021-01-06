@@ -43,25 +43,6 @@ class Database
         return false;
     }
 
-
-    /**
-     * Получение данных из БД по одному из реквизитов
-     *
-     * @param $table
-     * @param $field
-     * @param $data
-     * @return array
-     */
-
-    public function getByOneField($table, $field, $data)
-    {
-        $sql = "SELECT * FROM $table WHERE $field = ?";
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($data);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     /**
      * Получение данных из таблицы по условию на 1 поле
      * @param $table

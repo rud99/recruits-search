@@ -1,17 +1,20 @@
 <?php
 
 use Services\Database;
+use Services\GoogleDocs;
 
-require 'vendor/autoload.php';
 require 'config.php';
 require 'helpers.php';
 require 'Services/Database.php';
+require 'Services/GoogleDocs.php';
 
 try {
     $db = new Database();
     $people = $db->getByFieldAndCondition('people ', 'age', 18, '>');
     if ($people) {
-        exportToSheets($people);
+//        exportToSheets($people);
+        $gd = new  GoogleDocs();
+        $gd->exportToSheets($people);
         $code = 200;
         $message = "Данные успешно выгружены в <a href=".config('spreadsheet_url').">Google документ</a>";
     } else {
@@ -29,8 +32,7 @@ echo json_encode([
 
 
 
-
-function exportToSheets(array $data) {
+/*function exportToSheets(array $data) {
     $client = new \Google_Client();
     $client->setApplicationName('Google Sheets and PHP');
     $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
@@ -70,4 +72,4 @@ function clearSheets(Google_Service_Sheets $service, $spreadsheetId) {
     ] );
 
     $service->spreadsheets->batchUpdate( $spreadsheetId, $batchUpdateRequest );
-}
+}*/
